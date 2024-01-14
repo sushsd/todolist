@@ -1,15 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
-import "../globals.css";
+//import "../globals.css";
 
-function LargeCard(title: any) {
+function LargeCard({ title }: { title: any }) {
     return (
         <Card>
+            <CardHeader>{title}</CardHeader>
             <CardBody>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Large, full width sections goes here
-                </p>
+                <p>{title}</p>
             </CardBody>
         </Card>
     );
@@ -34,6 +33,7 @@ function Page() {
     }
 
     return (
+        //<LargeCard title="Hallo" />
         <div className="App">
             <ul
                 role="list"
@@ -44,15 +44,14 @@ function Page() {
                         key={task["id"]}
                         className="flex justify-between gap-x-6 py-5"
                     >
-                        {/* <div className="flex min-w-0 gap-x-4">
+                        <div className="flex min-w-0 gap-x-4">
                             <p className="text-sm font-semibold leading-6 text-gray-900">
                                 {task["title"]}
                             </p>
                             <p className="task-description">
                                 {task["description"]}
                             </p>
-                        </div> */}
-                        <LargeCard title={task["title"]} />
+                        </div>
                     </li>
                 ))}
             </ul>
