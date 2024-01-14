@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 255, 255, 255;
+    --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+            to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))
+        )
+        rgb(var(--background-start-rgb));
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+.form-input {
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 1em;
+    color: #282c34;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.form-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: none;
+    background-color: #61dafb;
+    color: #282c34;
+    cursor: pointer;
+}
+
+.task-card {
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #443d3d;
+}
+
+.task-title {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.task-description {
+    margin: 0;
+    color: #666;
+}
