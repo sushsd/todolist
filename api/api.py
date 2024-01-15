@@ -1,72 +1,77 @@
 import time
-from flask import Flask
-from flask import request
-
-all_tasks = [
-        {
-            'id': 1,
-            'title': 'Say Hello to bachha',
-            'description': 'I have to say hello to my bachha',
-            'done': False
-        },
-        {
-            'id': 2,
-            'title': 'Task 2',
-            'description': 'Task 2 Description',
-            'done': False
-        },
-        {
-            'id': 3,
-            'title': 'Task 3',
-            'description': 'Task 3 Description',
-            'done': True
-        }
-    ]
+from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
+from flask import session
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
+loggedInUser = ""
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000)
 
-@app.route('/time')
-def get_current_time():
-    return {'time': time.time()}
+class UserLoginDetails(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
 
-@app.route('/hello')
-def hello():
-    return {'message':"Hello World!"}
 
-@app.route('/api/hello')
-def apiHello():
-    return {'message':"Hello World!"}
+class UserTask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_login_details.id'), nullable=False)
+    task_title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
 
-@app.route('/api/create_task', methods=['GET','POST'])
-def create_task():
-    if request.method == 'POST':
-        jsonData = request.get_json()
-        print(jsonData['newTaskTitle'])
-        print(jsonData['newTaskDescription'])
-        new_id = len(all_tasks) + 1
-        all_tasks.append({
-            'id': new_id,
-            'title': jsonData['newTaskTitle'],
-            'description': jsonData['newTaskDescription'],
-            'done': False
-        })
-        return "success"
 
-@app.route('/api/login', methods=['GET','POST'])
+@app.route('/api/login', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
         jsonData = request.get_json()
-        print(jsonData['name'])
-        print(jsonData['password'])
+        username = jsonData['name']
+        password = jsonData['password']
+
+        user = UserLoginDetails.query.filter_by(username=username).first()
+
+        if not user:
+            user = UserLoginDetails(username=username, password=password)
+            db.session.add(user)
+            db.session.commit()
+
+        global loggedInUser
+        loggedInUser = username
+
         return "success"
 
 
 @app.route('/api/task_overview', methods=['GET'])
 def task_overview():
-    return { 
-        'username': 'Bachha',
-        'tasks': all_tasks
-        }
+
+    user = UserLoginDetails.query.filter_by(username=loggedInUser).first()
+
+    if user:
+        tasks = UserTask.query.filter_by(user_id=user.id).all()
+        task_list = [
+            {'id': task.id, 'title': task.task_title, 'description': task.description, 'done': False}
+            for task in tasks
+        ]
+        return {'username': loggedInUser, 'tasks': task_list}
+    else:
+        return {'message': 'User not found'}, 404
+
+
+@app.route('/api/create_task', methods=['GET', 'POST'])
+def create_task():
+    user = UserLoginDetails.query.filter_by(username=loggedInUser).first()
+    if user:
+        json_data = request.get_json()
+        new_task = UserTask(user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'])
+        db.session.add(new_task)
+        db.session.commit()
+        return "success"
+
+
+
+if __name__ == "__main__":
+#    with app.app_context():
+#        db.drop_all()
+#        db.create_all()
+    app.run(debug=True, port=3000)
