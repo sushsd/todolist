@@ -20,6 +20,7 @@ class UserTask(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user_login_details.id'), nullable=False)
     task_title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String(200), nullable=False)
+    is_done = db.Column(db.Boolean,default=False)
 
 
 @app.route('/api/login', methods=['GET', 'POST'])
@@ -76,7 +77,7 @@ def task_overview():
         ]
         return {'message': 'success', 'username': loggedInUser, 'tasks': task_list}
     else:
-        return {'message': 'User not found'}, 404
+        return {"message": "User not found"}, 404
 
 
 @app.route('/api/create_task', methods=['GET', 'POST'])
@@ -87,12 +88,24 @@ def create_task():
         new_task = UserTask(user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'])
         db.session.add(new_task)
         db.session.commit()
-        return "success"
+        return {"message": "success"}
+
+
+@app.route('/api/set_done', methods=['POST'])
+def task_done():
+    user = UserLoginDetails.query.filter_by(username=loggedInUser).first()
+    if user:
+        json_data = request.get_json()
+        task_id = json_data.get('id')
+        task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+        if task:
+            task.is_done = json_data.get('done')
+            db.session.commit()
+            return {"message" : "success"}
 
 
 
 if __name__ == "__main__":
-#    with app.app_context():
-#        db.drop_all()
-#        db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, port=3000)
