@@ -1,8 +1,3 @@
-:: start the backend
-cd api
-venv\Scripts\activate
-start cmd /k "flask run"
+start cmd /k "%~dp0start_backend.bat"
 
-:: start the frontend
-cd ../frontend
-start cmd /k "npm run start"
+start cmd /k "%~dp0start_frontend.bat"
