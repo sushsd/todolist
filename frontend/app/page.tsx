@@ -2,20 +2,15 @@
 
 import React, { useState } from "react";
 
-import { NextUIProvider, Input, Button } from "@nextui-org/react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { Input, Button } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import { Providers } from "app/components/providers";
 
 function App() {
     return (
-        <NextUIProvider>
-            <NextThemesProvider
-                attribute="class"
-                defaultTheme="dark"
-            >
-                <LoginPage />
-            </NextThemesProvider>
-        </NextUIProvider>
+        <Providers>
+            <LoginPage />
+        </Providers>
     );
 }
 

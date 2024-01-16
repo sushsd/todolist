@@ -1,38 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-    NextUIProvider,
-    Card,
-    CardHeader,
-    CardBody,
-    Divider,
-    Input,
-} from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { Input, Button } from "@nextui-org/react";
+import { TaskCard } from "app/components/TaskCard";
+import { Providers } from "app/components/providers";
 import "../globals.css";
-
-function TaskCard({ task }: { task: any }) {
-    return (
-        <Card>
-            <CardHeader>{task.title}</CardHeader>
-            <CardBody>
-                <p>{task.description}</p>
-            </CardBody>
-        </Card>
-    );
-}
 
 function TaskOverview() {
     return (
-        <NextUIProvider>
-            <NextThemesProvider
-                attribute="class"
-                defaultTheme="dark"
-            >
-                <Page />
-            </NextThemesProvider>
-        </NextUIProvider>
+        <Providers>
+            <Page />
+        </Providers>
     );
 }
 const Page = () => {
@@ -114,6 +91,7 @@ const Page = () => {
                 <Button
                     onClick={onCreateNewTast}
                     className="form-button"
+                    color="primary"
                 >
                     Create
                 </Button>
