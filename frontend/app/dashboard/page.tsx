@@ -12,7 +12,12 @@ function TaskOverview() {
         </Providers>
     );
 }
+
+export const TaskOverviewContext = React.createContext({});
+
 const Page = () => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingTaskId, setEditingTaskId] = useState(-1);
     const [tasks, setTasks] = useState({ username: "", tasks: [] });
     const [isLoading, setIsLoading] = useState(true);
     const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -66,9 +71,18 @@ const Page = () => {
                 {tasks.tasks.map((task) => (
                     <li
                         key={task["id"]}
-                        className="columns justify-center py-5 px-10"
+                        className="columns justify-center py-1 px-10"
                     >
-                        <TaskCard task={task} />
+                        <TaskOverviewContext.Provider
+                            value={{
+                                isEditing: isEditing,
+                                setIsEditing: setIsEditing,
+                                editingTaskId: editingTaskId,
+                                setEditingTaskId: setEditingTaskId,
+                            }}
+                        >
+                            <TaskCard task={task} />
+                        </TaskOverviewContext.Provider>
                     </li>
                 ))}
             </ul>
