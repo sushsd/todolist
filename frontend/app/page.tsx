@@ -24,7 +24,7 @@ function LoginPage() {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
-    async function onSubmit() {
+    async function onLogin() {
         console.log("submitting");
         const response = await fetch("/api/login", {
             method: "POST",
@@ -33,20 +33,19 @@ function LoginPage() {
             },
             body: JSON.stringify({ name, password }),
         });
-        console.log(response);
-        //const body = await response.json();
-        //console.log(body);
 
-        if (response.ok) {
-            const message = await response.text();
-            console.log(message);
+        const data = await response.json();
+        console.log(data.message);
+        if (data.message === "success") {
             router.push("/dashboard");
-        } else {
+        } else if (data.message === "Incorrect Password") {
+            alert("Incorrect Password");
+        } else if (data.message === "User not found") {
+            alert("User not found");
         }
     }
 
     async function onRegister() {
-        console.log("registering new user");
         const response = await fetch("/api/register", {
             method: "POST",
             headers: {
@@ -55,11 +54,12 @@ function LoginPage() {
             body: JSON.stringify({ name, password }),
         });
 
-        if (response.ok) {
-            const message = await response.text();
-            console.log(message);
+        const data = await response.json();
+        console.log(data.message);
+        if (data.message === "success") {
             router.push("/dashboard");
-        } else {
+        } else if (data.message === "User already exists") {
+            alert("User already exists");
         }
     }
 
@@ -92,13 +92,13 @@ function LoginPage() {
                     </div>
                     <div className="flex w-1/2 space-x-3 items-center justify-center">
                         <Button
-                            onClick={onSubmit}
+                            onClick={onLogin}
                             className="form-button"
                         >
                             Log In
                         </Button>
                         <Button
-                            onClick={onSubmit}
+                            onClick={onRegister}
                             className="form-button"
                         >
                             Register

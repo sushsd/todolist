@@ -32,14 +32,16 @@ def form():
         user = UserLoginDetails.query.filter_by(username=username).first()
 
         if not user:
-            return "failed"
+            return {"message": "User not found"}
 
         else:
             if user.password == password:
                 global loggedInUser
                 loggedInUser = username
 
-                return "success"
+                return {"message": "success"}
+            else:
+                return {"message": "Incorrect Password"}
 
 @app.route('/api/register',methods=['GET','POST'])
 def register():
@@ -50,13 +52,15 @@ def register():
     user = UserLoginDetails.query.filter_by(username=username).first()
 
     if user:
-        return "You are already registered,Please Log In"
+        return {"message": "User already exists"}
 
     else:
         user = UserLoginDetails(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-        return "success"
+        global loggedInUser
+        loggedInUser = username
+        return {"message": "success"}
 
 
 @app.route('/api/task_overview', methods=['GET'])
@@ -70,7 +74,7 @@ def task_overview():
             {'id': task.id, 'title': task.task_title, 'description': task.description, 'done': False}
             for task in tasks
         ]
-        return {'username': loggedInUser, 'tasks': task_list}
+        return {'message': 'success', 'username': loggedInUser, 'tasks': task_list}
     else:
         return {'message': 'User not found'}, 404
 
