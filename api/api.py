@@ -32,13 +32,30 @@ def form():
         user = UserLoginDetails.query.filter_by(username=username).first()
 
         if not user:
-            user = UserLoginDetails(username=username, password=password)
-            db.session.add(user)
-            db.session.commit()
+            return "failed"
 
-        global loggedInUser
-        loggedInUser = username
+        else:
+            if user.password == password:
+                global loggedInUser
+                loggedInUser = username
 
+                return "success"
+
+@app.route('/api/register',methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        jsonData = request.get_json()
+        username = jsonData['name']
+        password = jsonData['password']
+    user = UserLoginDetails.query.filter_by(username=username).first()
+
+    if user:
+        return "You are already registered,Please Log In"
+
+    else:
+        user = UserLoginDetails(username=username, password=password)
+        db.session.add(user)
+        db.session.commit()
         return "success"
 
 
