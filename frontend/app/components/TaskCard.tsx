@@ -45,18 +45,6 @@ export function TaskCard({ task }: { task: any }) {
         task.description
     );
 
-    let description = (
-        <Textarea
-            className="h-full"
-            value={editedDescription}
-            onChange={(e) => setEditedDescription(e.target.value)}
-            isReadOnly={!isEditing}
-            size="lg"
-            disableAutosize
-            rows={20}
-        ></Textarea>
-    );
-
     let title = (
         <Input
             value={editedTitle}
@@ -161,12 +149,28 @@ export function TaskCard({ task }: { task: any }) {
             >
                 <ModalContent>
                     <ModalHeader className="flex flex-col justify-between gap-1 pb-6 pt-8">
-                        <div className="flex justify-between items-center pr-6">
+                        <div className="flex justify-between items-center pr-6 gap-4">
                             {title}
                             {button_row}
                         </div>
                     </ModalHeader>
-                    <ModalBody>{description}</ModalBody>
+                    <ModalBody className="h-full w-full">
+                        <Textarea
+                            value={editedDescription}
+                            onChange={(e) =>
+                                setEditedDescription(e.target.value)
+                            }
+                            isReadOnly={!isEditing}
+                            size="lg"
+                            variant="bordered"
+                            disableAutosize
+                            className="h-full w-full"
+                            classNames={{
+                                inputWrapper: "!h-[calc(100vh-10rem)]",
+                                input: "h-full",
+                            }}
+                        ></Textarea>
+                    </ModalBody>
                 </ModalContent>
             </Modal>
             <Card
