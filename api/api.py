@@ -103,6 +103,22 @@ def task_done():
             db.session.commit()
             return {"message" : "success"}
 
+@app.route('/api/modified_task',methods=['PUT'])
+def modified_task():
+    user = UserLoginDetails.query.filter_by(username=loggedInUser).first()
+    if user:
+        json_data = request.get_json()
+        task_id = json_data.get('id')
+        new_title = json_data.get('title')
+        new_descritpion = json_data.get('description')
+        task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+        if task:
+            task.task_title = new_title
+            task.description = new_descritpion
+            db.session.commit()
+            return {"message" : "success"}
+
+
 
 
 if __name__ == "__main__":
