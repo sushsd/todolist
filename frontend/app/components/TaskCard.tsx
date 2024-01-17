@@ -1,6 +1,8 @@
 import React, { use } from "react";
 import {
     Button,
+    Input,
+    Textarea,
     Card,
     CardHeader,
     CardBody,
@@ -38,6 +40,33 @@ export function TaskCard({ task }: { task: any }) {
         }
     };
 
+    const [editedTitle, setEditedTitle] = React.useState(task.title);
+    const [editedDescription, setEditedDescription] = React.useState(
+        task.description
+    );
+
+    let description = (
+        <Textarea
+            className="h-full"
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
+            isReadOnly={!isEditing}
+            size="lg"
+            disableAutosize
+            rows={20}
+        ></Textarea>
+    );
+
+    let title = (
+        <Input
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            isReadOnly={!isEditing}
+            variant="bordered"
+            size="lg"
+        ></Input>
+    );
+
     async function onStartEditing() {
         setEditingTaskId(task.id);
         setIsEditing(true);
@@ -45,14 +74,31 @@ export function TaskCard({ task }: { task: any }) {
     }
 
     async function onConfirmEdit() {
+        const response = await fetch("/api/modified_task", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: task.id,
+                title: editedTitle,
+                description: editedDescription,
+            }),
+        });
+
+        task.title = editedTitle;
+        task.description = editedDescription;
         setEditingTaskId(-1);
         setIsEditing(false);
+
         console.log("confirm edit");
     }
 
     async function onCancelEdit() {
         setEditingTaskId(-1);
         setIsEditing(false);
+        setEditedTitle(task.title);
+        setEditedDescription(task.description);
         console.log("cancel edit");
     }
 
@@ -116,13 +162,11 @@ export function TaskCard({ task }: { task: any }) {
                 <ModalContent>
                     <ModalHeader className="flex flex-col justify-between gap-1 pb-6 pt-8">
                         <div className="flex justify-between items-center pr-6">
-                            <h1>{task.title}</h1>
+                            {title}
                             {button_row}
                         </div>
                     </ModalHeader>
-                    <ModalBody>
-                        <p>{task.description}</p>
-                    </ModalBody>
+                    <ModalBody>{description}</ModalBody>
                 </ModalContent>
             </Modal>
             <Card
