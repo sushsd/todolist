@@ -1,5 +1,6 @@
 from flask import request,session,Blueprint
 from models import db,UserLoginDetails,UserTask
+from datetime import datetime
 
 bp = Blueprint('tasks', __name__, url_prefix='/api')
 
@@ -13,7 +14,7 @@ def task_overview():
         if user:
             tasks = UserTask.query.filter_by(user_id=user.id).all()
             task_list = [
-                {'id': task.id, 'title': task.task_title, 'description': task.description, 'done': task.is_done}
+                {'id': task.id, 'title': task.task_title, 'description': task.description, 'done': task.is_done,'created_time':task.created_time,'updated_time':task.updated_time}
                 for task in tasks
             ]
             return {'message': 'success', 'username': logged_in_user, 'tasks': task_list}
