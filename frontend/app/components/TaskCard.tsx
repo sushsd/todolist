@@ -40,6 +40,8 @@ export function TaskCard({ task }: { task: any }) {
         }
     };
 
+    const date = new Date(task.created_time);
+    console.log(date.toDateString());
     const [editedTitle, setEditedTitle] = React.useState(task.title);
     const [editedDescription, setEditedDescription] = React.useState(
         task.description
@@ -90,7 +92,7 @@ export function TaskCard({ task }: { task: any }) {
         console.log("cancel edit");
     }
 
-    async function onExpand() {}
+    async function onExpand() { }
 
     let button_row;
     if (isEditing && editingTaskId === task.id) {
@@ -179,15 +181,16 @@ export function TaskCard({ task }: { task: any }) {
                 onPress={onOpen}
                 className="w-full"
             >
-                <CardHeader>
+                <CardHeader className="flex justify-between">
                     <div className="flex gap-3">
-                        <Checkbox
-                            color="primary"
-                            checked={task.done}
-                            onChange={(e) => setDone(e.target.checked)}
-                        ></Checkbox>
-                        <p>{task.title}</p>
+                            <Checkbox
+                                color="primary"
+                                checked={task.done}
+                                onChange={(e) => setDone(e.target.checked)}
+                            ></Checkbox>
+                            <p>{task.title}</p>
                     </div>
+                        <p>{"Created: " + date.toDateString()}</p>
                 </CardHeader>
             </Card>
         </>
