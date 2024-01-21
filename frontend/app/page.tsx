@@ -2,7 +2,9 @@
 
 import React, { useState } from "react";
 
-import { Input, Button } from "@nextui-org/react";
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 import { useRouter } from "next/navigation";
 import { Providers } from "app/components/providers";
 
@@ -13,6 +15,7 @@ function App() {
         </Providers>
     );
 }
+
 
 function LoginPage() {
     const [name, setName] = useState("");
@@ -28,6 +31,7 @@ function LoginPage() {
             },
             body: JSON.stringify({ name, password }),
         });
+
 
         const data = await response.json();
         console.log(data.message);
@@ -64,7 +68,7 @@ function LoginPage() {
                 <div className="flex flex-col items-center justify-center space-y-3">
                     <h1 className="text-5xl pt-10 pb-6">Bachh-Do List</h1>
                     <div className="flex ">
-                        <Input
+                        <TextField
                             name="name"
                             type="text"
                             label="Name"
@@ -75,11 +79,12 @@ function LoginPage() {
                         />
                     </div>
                     <div className="flex">
-                        <Input
+                        <TextField
                             name="password"
                             type="password"
                             label="Password"
                             required
+                            variant="outlined"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="form-input"
@@ -89,12 +94,14 @@ function LoginPage() {
                         <Button
                             onClick={onLogin}
                             className="form-button"
+                            variant="contained"
                         >
                             Log In
                         </Button>
                         <Button
                             onClick={onRegister}
                             className="form-button"
+                            variant="contained"
                         >
                             Register
                         </Button>
