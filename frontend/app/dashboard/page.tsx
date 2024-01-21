@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import "../globals.css";
-import { Box, Stack} from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { styled, useTheme } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
@@ -19,6 +19,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { CreateTaskModal } from "app/components/CreateTaskModal";
+import { Task } from "app/components/src/Task";
+import { EditTaskModal } from "app/components/EditTaskModal";
 
 function TaskOverview() {
     return (
@@ -35,6 +37,8 @@ const Page = () => {
     const [newTaskDescription, setNewTaskDescription] = useState("");
     const [isCreatingNewTask, setIsCreatingNewTask] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isEditingTask, setIsEditingTask] = useState(false);
+    const [editedTask, setEditedTask] = useState(new Task({}));
 
 
     const getDrawerWidth = () => {
@@ -46,7 +50,6 @@ const Page = () => {
         setIsLoading(true);
         const response = await fetch("/api/task_overview");
         const data = await response.json();
-        console.log(data);
         setTasks(data);
         setIsLoading(false);
     };
@@ -131,6 +134,12 @@ const Page = () => {
                                             "&:last-child td, &:last-child th":
                                                 { border: 0 },
                                         }}
+                                        hover
+                                        onClick={() => {
+                                            setIsEditingTask(true);
+                                            setEditedTask(row);
+                                        }
+                                        }
                                     >
                                         <TableCell
                                             component="th"
@@ -200,17 +209,29 @@ const Page = () => {
         <Box sx={{
             height: "100vh"
         }}>
-            <CreateTaskModal open={isCreatingNewTask} onClose={() => setIsCreatingNewTask(false)} />
-            <Stack direction="row" sx={{height: 1, padding: "10px"}}>
+            <CreateTaskModal 
+                open={isCreatingNewTask} 
+                onClose={() => {
+                    setIsCreatingNewTask(false)
+                    fetchTasks();
+                }} />
+            <EditTaskModal
+                open={isEditingTask}
+                onClose={() => {
+                    setIsEditingTask(false);
+                    setEditedTask(new Task({}));
+                    fetchTasks();
+                }} task={editedTask} />
+            <Stack direction="row" sx={{ height: 1, padding: "10px" }}>
                 <Box sx={{ flexGrow: 1 }}>
-                <IconButton
-                    color="inherit"
-                    aria-label="menu"
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
-                    <MenuIcon />
-                </IconButton>
+                    <IconButton
+                        color="inherit"
+                        aria-label="menu"
+                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+                        <MenuIcon />
+                    </IconButton>
                 </Box>
-            {drawTasksTable(tasks.tasks)}
+                {drawTasksTable(tasks.tasks)}
             </Stack>
             <Drawer
                 anchor="left"

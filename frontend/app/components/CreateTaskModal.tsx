@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
-import Input from "@mui/material/Input";
+import { TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
@@ -18,13 +18,18 @@ export const CreateTaskModal = ({open, onClose}) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                title: newTaskTitle,
-                description: newTaskDescription,
+                newTaskTitle,
+                newTaskDescription,
             }),
         });
+        console.log(JSON.stringify({
+                newTaskTitle,
+                newTaskDescription,
+            }));
 
         if (response.ok) {
             const message = await response.text();
+            onClose();
         } else {
         }
     };
@@ -40,8 +45,7 @@ export const CreateTaskModal = ({open, onClose}) => {
                 component={Card}
                 elevation={5}
                 sx={{
-                    width: 300,
-                    height: 300,
+                    width: 0.5,
                     bgcolor: "background.paper",
                     borderRadius: "20px",
                     position: "absolute",
@@ -56,17 +60,18 @@ export const CreateTaskModal = ({open, onClose}) => {
                     sx={{ padding: "30px" }}
                 >
                     <h1 className="text-center">Create a new Task</h1>
-                    <Input
-                        name="task-title"
-                        type="text"
+                    <TextField
+                        id="title"
                         value={newTaskTitle}
+                        maxRows={1}
                         onChange={(e) =>
                             setNewTaskTitle(e.target.value)
                         }
                     />
-                    <Input
-                        name="task-description"
-                        type="text"
+                    <TextField
+                        id="description"
+                        multiline
+                        rows={20}
                         value={newTaskDescription}
                         onChange={(e) =>
                             setNewTaskDescription(e.target.value)
