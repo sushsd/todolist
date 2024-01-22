@@ -11,12 +11,14 @@ import { Task } from "app/components/src/Task";
 //TODO: Create shared Create/Edit Task Modal
 export const EditTaskModal = ({
     open,
-    onClose,
+    onConfirm,
+    onCancel,
     //TODO: Needs onCancel so we dont fetch data unnecessarily
     task,
 }: {
     open: boolean;
-    onClose: () => void;
+    onConfirm: () => void;
+    onCancel: () => void;
     task: Task;
 }) => {
     const [editedTaskTitle, setEditedTaskTitle] = React.useState(task.title);
@@ -29,7 +31,7 @@ export const EditTaskModal = ({
         setEditedTaskDescription(task.description);
     }, [task]);
 
-    const onEditTask = async () => {
+    const onConfirmTask = async () => {
         const response = await fetch("/api/modified_task", {
             method: "PUT",
             headers: {
@@ -44,7 +46,8 @@ export const EditTaskModal = ({
 
         if (response.ok) {
             const message = await response.text();
-            onClose();
+
+            onConfirm();
         } else {
         }
     };
@@ -52,7 +55,7 @@ export const EditTaskModal = ({
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={onCancel}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -91,7 +94,7 @@ export const EditTaskModal = ({
                         }
                     />
                     <Button
-                        onClick={onEditTask}
+                        onClick={onConfirmTask}
                         className="form-button"
                         color="primary"
                         variant="contained"

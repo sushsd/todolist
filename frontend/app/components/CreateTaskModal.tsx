@@ -6,7 +6,16 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 
-export const CreateTaskModal = ({open, onClose}) => {
+export const CreateTaskModal = (
+    {
+        open,
+        onConfirm,
+        onCancel,
+    }: {
+        open: boolean;
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) => {
     const [newTaskTitle, setNewTaskTitle] = React.useState("");
     const [newTaskDescription, setNewTaskDescription] =
         React.useState("");
@@ -23,13 +32,13 @@ export const CreateTaskModal = ({open, onClose}) => {
             }),
         });
         console.log(JSON.stringify({
-                newTaskTitle,
-                newTaskDescription,
-            }));
+            newTaskTitle,
+            newTaskDescription,
+        }));
 
         if (response.ok) {
             const message = await response.text();
-            onClose();
+            onConfirm();
         } else {
         }
     };
@@ -37,7 +46,7 @@ export const CreateTaskModal = ({open, onClose}) => {
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={onCancel}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >

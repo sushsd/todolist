@@ -11,7 +11,7 @@ export class Task {
         this.id = task.id;
         this.title = task.title;
         this.description = task.description;
-        this.is_done = task.is_done;
+        this.is_done = task.done;
         this.created_time = new Date(task.created_time);
         this.updated_time = new Date(task.updated_time);
     }
