@@ -89,3 +89,20 @@ def modified_task():
             return {"message": "User not found"}, 404
     else:
         return {"message": "User not logged in"}, 401
+
+@bp.route('/deleted_task', methods=['DELETE'])
+def deleted_task():
+    logged_in_user = session.get('loggedInUser')
+    if logged_in_user:
+        user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+
+        if user:
+            json_data = request.get_json()
+            task_id = json_data.get('id')
+            task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+
+            if task:
+                db.session.delete(task)
+                db.session.commit()
+                return {"message": "Success"}
+
