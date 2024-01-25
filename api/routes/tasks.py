@@ -1,5 +1,5 @@
-from flask import request,session,Blueprint
-from models import db,UserLoginDetails,UserTask
+from flask import request, session, Blueprint
+from models import db, UserLoginDetails, UserTask
 from datetime import datetime
 
 bp = Blueprint('tasks', __name__, url_prefix='/api')
@@ -14,7 +14,14 @@ def task_overview():
         if user:
             tasks = UserTask.query.filter_by(user_id=user.id).all()
             task_list = [
-                {'id': task.id, 'title': task.task_title, 'description': task.description, 'done': task.is_done,'created_time':task.created_time,'updated_time':task.updated_time}
+                {
+                    'id': task.id,
+                    'title': task.task_title,
+                    'description': task.description,
+                    'done': task.is_done,
+                    'created_time': task.created_time,
+                    'updated_time': task.updated_time
+                }
                 for task in tasks
             ]
             return {'message': 'success', 'username': logged_in_user, 'tasks': task_list}
@@ -105,4 +112,52 @@ def deleted_task():
                 db.session.delete(task)
                 db.session.commit()
                 return {"message": "Success"}
+
+@bp.route('/search', methods=['GET', 'POST'])
+def search():
+    logged_in_user = session.get('loggedInUser')
+
+    if logged_in_user:
+        user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+
+        if user:
+            json_data = request.get_json()
+            task_title = json_data.get('title')
+            search_results = UserTask.query.filter(UserTask.task_title.ilike(f"%{task_title}%"), UserTask.user_id == user.id).all()
+
+            if search_results:
+                task_list = [
+                    {
+                        'id': task.id,
+                        'title': task.task_title,
+                        'description': task.description,
+                        'done': task.is_done,
+                        'created_time': task.created_time,
+                        'updated_time': task.updated_time
+                    }
+                    for task in search_results
+                ]
+                return {"message": "success", 'username': logged_in_user, 'tasks': task_list}
+            else:
+                return {"message": "No matching result"}
+
+        else:
+            return {"message": "User not found"}, 404
+    else:
+        return {"message": "User not logged in"}, 401
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
