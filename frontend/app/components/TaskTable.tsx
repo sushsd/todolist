@@ -1,4 +1,4 @@
-import { Box, Checkbox, Divider, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Box, Checkbox, Divider, IconButton, InputBase, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Task } from "./src/Task";
 import { CreateTaskModal } from "./CreateTaskModal";
@@ -9,26 +9,29 @@ import ClearIcon from '@mui/icons-material/Clear';
 export const TaskTable = ({
     isDrawerOpen,
     drawerWidth,
+    tasks,
+    fetchTasks,
 }: {
     isDrawerOpen: boolean;
     drawerWidth: number;
+    tasks: Task[];
+    fetchTasks: () => void;
 }) => {
 
-    const [newTaskTitle, setNewTaskTitle] = useState("");
-    const [newTaskDescription, setNewTaskDescription] = useState("");
     const [isEditingTask, setIsEditingTask] = useState(false);
-    const [tasks, setTasks] = useState([Task]);
-    const [isLoading, setIsLoading] = useState(true);
+    //const [tasks, setTasks] = useState([Task]);
+    //const [isLoading, setIsLoading] = useState(true);
     const [isCreatingNewTask, setIsCreatingNewTask] = useState(false);
     const [editedTask, setEditedTask] = useState(new Task({}));
 
-    const fetchTasks = async () => {
-        setIsLoading(true);
-        const response = await fetch("/api/task_overview");
-        const data = await response.json();
-        setTasks(data.tasks.map((task: any) => new Task(task)));
-        setIsLoading(false);
-    };
+//    //TODO move this one level up and pass tasks as a prop so we can pass search results aswell
+//    const fetchTasks = async () => {
+//        setIsLoading(true);
+//        const response = await fetch("/api/task_overview");
+//        const data = await response.json();
+//        setTasks(data.tasks.map((task: any) => new Task(task)));
+//        setIsLoading(false);
+//    };
 
     //TODO: Many places need to not use this, instead update the state.
     async function onDeletedTask(task: Task) {
@@ -51,9 +54,9 @@ export const TaskTable = ({
         fetchTasks();
     }, []);
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
+//    if (isLoading) {
+//        return <div>Loading...</div>;
+//    }
 
     return (
         <Box
@@ -64,6 +67,7 @@ export const TaskTable = ({
                 paddingLeft: "10px"
             }}
         >
+
             <CreateTaskModal
                 open={isCreatingNewTask}
                 onConfirm={() => {
@@ -177,7 +181,7 @@ export const TaskTable = ({
                                                         return task;
                                                     }
                                                 );
-                                                setTasks(newTasks);
+                                                //setTasks(newTasks);
                                             }} />
                                     </TableCell>
                                     <TableCell
