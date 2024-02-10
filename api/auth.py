@@ -1,19 +1,15 @@
-from flask import Blueprint,request,session
-from models import db, UserLoginDetails, UserTask
+from flask import request, session
+from flask_restful import Resource, Api
+from models import db, UserLoginDetails
 
+api = Api()
 
-bp = Blueprint('auth', __name__, url_prefix='/api')
-
-@bp.route('/hello',methods=['GET'])
-def hello():
-    return "Hello"
-
-@bp.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        jsonData = request.get_json()
-        username = jsonData['name']
-        password = jsonData['password']
+class LoginResource(Resource):
+    def post(self):
+        json_data = request.get_json()
+        print(json_data)
+        username = json_data['name']
+        password = json_data['password']
 
         user = UserLoginDetails.query.filter_by(username=username).first()
 
@@ -23,18 +19,15 @@ def login():
         else:
             if user.password == password:
                 session['loggedInUser'] = username
-
-
                 return {"message": "success"}
             else:
                 return {"message": "Incorrect Password"}
 
-@bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        jsonData = request.get_json()
-        username = jsonData['name']
-        password = jsonData['password']
+class RegisterResource(Resource):
+    def post(self):
+        json_data = request.get_json()
+        username = json_data['name']
+        password = json_data['password']
 
         user = UserLoginDetails.query.filter_by(username=username).first()
 
@@ -46,5 +39,6 @@ def register():
             db.session.commit()
             session['loggedInUser'] = username
             return {"message": "success"}
-    else:
-        return {"message": "Invalid request method"}
+
+api.add_resource(LoginResource, '/api/login')
+api.add_resource(RegisterResource, '/api/register')
