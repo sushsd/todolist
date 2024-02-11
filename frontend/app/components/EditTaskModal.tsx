@@ -42,6 +42,7 @@ export const EditTaskModal = ({
                 id: task.id,
                 title: editedTaskTitle,
                 description: editedTaskDescription,
+                tags: editedTaskTags,
             }),
         });
 
