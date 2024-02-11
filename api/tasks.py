@@ -153,8 +153,8 @@ class SearchResource(Resource):
                             'title': task.task_title,
                             'description': task.description,
                             'done': task.is_done,
-                            'created_time': task.created_time,
-                            'updated_time': task.updated_time
+                            'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
+                            'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
                         }
                         for task in search_results
                     ]
