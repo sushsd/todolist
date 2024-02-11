@@ -1,19 +1,20 @@
 import json
 
-from flask import session,request
+from flask import session, request
 from models import db, UserLoginDetails, UserTask
 from flask_restful import Resource, Api
 
 
-
 api = Api()
+
 
 class TaskOverviewResource(Resource):
     def get(self):
         logged_in_user = session.get('loggedInUser')
 
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 tasks = UserTask.query.filter_by(user_id=user.id).all()
@@ -23,7 +24,7 @@ class TaskOverviewResource(Resource):
                         'title': task.task_title,
                         'description': task.description,
                         'done': task.is_done,
-                        'tags' : task.tags,
+                        'tags': task.tags,
                         'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
                         'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
                     }
@@ -35,7 +36,8 @@ class TaskOverviewResource(Resource):
         else:
             return {"message": "User not logged in"}, 401
 
-api.add_resource(TaskOverviewResource,'/api/task_overview')
+
+api.add_resource(TaskOverviewResource, '/api/task_overview')
 
 
 class CreateTaskResource(Resource):
@@ -44,11 +46,13 @@ class CreateTaskResource(Resource):
         logged_in_user = session.get('loggedInUser')
 
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 json_data = request.get_json()
-                new_task = UserTask(user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'],tags=json_data['newTaskTags'])
+                new_task = UserTask(
+                    user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'], tags=json_data['newTaskTags'])
                 db.session.add(new_task)
                 db.session.commit()
                 return {"message": "success"}
@@ -57,7 +61,9 @@ class CreateTaskResource(Resource):
         else:
             return {"message": "User not logged in"}, 401
 
-api.add_resource(CreateTaskResource,'/api/create_task')
+
+api.add_resource(CreateTaskResource, '/api/create_task')
+
 
 class SetDoneResource(Resource):
 
@@ -65,12 +71,14 @@ class SetDoneResource(Resource):
         logged_in_user = session.get('loggedInUser')
 
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 json_data = request.get_json()
                 task_id = json_data.get('id')
-                task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+                task = UserTask.query.filter_by(
+                    id=task_id, user_id=user.id).first()
 
                 if task:
                     task.is_done = json_data.get('done')
@@ -83,7 +91,8 @@ class SetDoneResource(Resource):
         else:
             return {"message": "User not logged in"}, 401
 
-api.add_resource(SetDoneResource,'/api/set_done')
+
+api.add_resource(SetDoneResource, '/api/set_done')
 
 
 class ModifyTaskResource(Resource):
@@ -92,7 +101,8 @@ class ModifyTaskResource(Resource):
         logged_in_user = session.get('loggedInUser')
 
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 json_data = request.get_json()
@@ -101,12 +111,13 @@ class ModifyTaskResource(Resource):
                 new_description = json_data.get('description')
                 new_tags = json_data.get('tags')
 
-                task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+                task = UserTask.query.filter_by(
+                    id=task_id, user_id=user.id).first()
 
                 if task:
                     task.task_title = new_title
                     task.description = new_description
-                    task.tags  = new_tags
+                    task.tags = new_tags
                     db.session.commit()
                     return {"message": "success"}
                 else:
@@ -116,26 +127,31 @@ class ModifyTaskResource(Resource):
         else:
             return {"message": "User not logged in"}, 401
 
-api.add_resource(ModifyTaskResource,'/api/modified_task')
+
+api.add_resource(ModifyTaskResource, '/api/modified_task')
 
 
 class DeleteTaskResource(Resource):
     def delete(self):
         logged_in_user = session.get('loggedInUser')
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 json_data = request.get_json()
                 task_id = json_data.get('id')
-                task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
+                task = UserTask.query.filter_by(
+                    id=task_id, user_id=user.id).first()
 
                 if task:
                     db.session.delete(task)
                     db.session.commit()
                     return {"message": "Success"}
 
-api.add_resource(DeleteTaskResource,'/api/deleted_task')
+
+api.add_resource(DeleteTaskResource, '/api/deleted_task')
+
 
 class SearchResource(Resource):
 
@@ -143,9 +159,8 @@ class SearchResource(Resource):
         logged_in_user = session.get('loggedInUser')
 
         if logged_in_user:
-            user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
-
-
+            user = UserLoginDetails.query.filter_by(
+                username=logged_in_user).first()
 
             if user:
                 json_data = request.get_json()
@@ -153,9 +168,11 @@ class SearchResource(Resource):
                 tags = json_data.get('tags')
 
                 if task_title == "":
-                    search_results = UserTask.query.filter(UserTask.tags.ilike(f"%{tags}%"), UserTask.user_id == user.id).all()
+                    search_results = UserTask.query.filter(UserTask.tags.ilike(
+                        f"%{tags}%"), UserTask.user_id == user.id).all()
                 else:
-                    search_results = UserTask.query.filter(UserTask.task_title.ilike(f"%{task_title}%"), UserTask.user_id == user.id).all()
+                    search_results = UserTask.query.filter(UserTask.task_title.ilike(
+                        f"%{task_title}%"), UserTask.user_id == user.id).all()
 
                 if search_results:
                     task_list = [
@@ -179,6 +196,5 @@ class SearchResource(Resource):
         else:
             return {"message": "User not logged in"}, 401
 
-api.add_resource(SearchResource,'/api/search')
 
-
+api.add_resource(SearchResource, '/api/search')

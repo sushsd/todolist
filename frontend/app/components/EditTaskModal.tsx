@@ -13,7 +13,6 @@ export const EditTaskModal = ({
     open,
     onConfirm,
     onCancel,
-    //TODO: Needs onCancel so we dont fetch data unnecessarily
     task,
 }: {
     open: boolean;
@@ -25,10 +24,12 @@ export const EditTaskModal = ({
     const [editedTaskDescription, setEditedTaskDescription] = React.useState(
         task.description
     );
+    const [editedTaskTags, setEditedTaskTags] = React.useState(task.tags);
 
     React.useEffect(() => {
         setEditedTaskTitle(task.title);
         setEditedTaskDescription(task.description);
+        setEditedTaskTags(task.tags);
     }, [task]);
 
     const onConfirmTask = async () => {
@@ -84,6 +85,13 @@ export const EditTaskModal = ({
                         maxRows={1}
                         onChange={(e) => setEditedTaskTitle(e.target.value)}
                     />
+                    <TextField
+                        id="tags"
+                        variant="outlined"
+                        value={editedTaskTags}
+                        maxRows={1}
+                        onChange={(e) => setEditedTaskTags(e.target.value)}
+                        />
                     <TextField
                         id="description"
                         multiline

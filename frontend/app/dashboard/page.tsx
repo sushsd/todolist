@@ -43,11 +43,18 @@ const Page = () => {
 
 
     const fetchTasks = async (searchTerm: string = "") => {
+        let searchTags = "";
         if (searchTerm === "") {
             const response = await fetch("/api/task_overview");
             const data = await response.json();
             setTasks(data.tasks.map((task: any) => new Task(task)));
-        } else {
+        } 
+        else if (searchTerm[0] === "#") {
+            searchTags = searchTerm;
+            searchTerm = "";
+        }
+
+        if (searchTags !== "") {
             const response = await fetch("/api/search", {
                 method: "POST",
                 headers: {
@@ -55,6 +62,7 @@ const Page = () => {
                 },
                 body: JSON.stringify({
                     title: searchTerm,
+                    tags: searchTags,
                 }),
             });
             const data = await response.json();
@@ -98,7 +106,7 @@ const Page = () => {
                             {`Results for "${pageTitle}"`}
                         </Typography>
                     </Box>
-                    <TaskTable isDrawerOpen={isDrawerOpen} drawerWidth={getDrawerWidth()} fetchTasks={fetchTasks} tasks={tasks} />
+                    <TaskTable drawerWidth={getDrawerWidth()} fetchTasks={fetchTasks} tasks={tasks} setTasks={setTasks}/>
                 </Stack>
             </Stack>
             <Drawer

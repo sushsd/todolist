@@ -6,34 +6,132 @@ import { EditTaskModal } from "./EditTaskModal";
 import ClearIcon from '@mui/icons-material/Clear';
 
 
+
 export const TaskTable = ({
-    isDrawerOpen,
     drawerWidth,
     tasks,
+    setTasks,
     fetchTasks,
 }: {
-    isDrawerOpen: boolean;
     drawerWidth: number;
     tasks: Task[];
+    setTasks: (tasks: Task[]) => void;
     fetchTasks: () => void;
 }) => {
 
     const [isEditingTask, setIsEditingTask] = useState(false);
-    //const [tasks, setTasks] = useState([Task]);
-    //const [isLoading, setIsLoading] = useState(true);
     const [isCreatingNewTask, setIsCreatingNewTask] = useState(false);
     const [editedTask, setEditedTask] = useState(new Task({}));
 
-//    //TODO move this one level up and pass tasks as a prop so we can pass search results aswell
-//    const fetchTasks = async () => {
-//        setIsLoading(true);
-//        const response = await fetch("/api/task_overview");
-//        const data = await response.json();
-//        setTasks(data.tasks.map((task: any) => new Task(task)));
-//        setIsLoading(false);
-//    };
+    const TaskDoneCheckbox = ({ tasks, row }: { tasks: Task[], row: any }) => {
+        return <Checkbox
+            onClick={(event) => {
+                event.stopPropagation();
+            }}
+            checked={row.is_done}
+            onChange={() => {
+                fetch("/api/set_done", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+                    body: JSON.stringify({
+                        id: row.id,
+                        done: !row.is_done,
+                    }),
+                });
+                row.is_done = !row.is_done;
+                const newTasks = tasks.map(
+                    (task: any) => {
+                        if (
+                            task.id === row.id
+                        ) {
+                            return row;
+                        }
+                        return task;
+                    }
+                );
+                setTasks(newTasks);
+            }} />
+    }
 
-    //TODO: Many places need to not use this, instead update the state.
+    const TaskTableBody = ({ tasks}: { tasks: Task[] }) => {
+        return <TableBody>
+            <TableRow
+                sx={{
+                    "&:last-child td, &:last-child th": {
+                        border: 0,
+                    },
+                }}
+                hover
+                onClick={() => setIsCreatingNewTask(true)}
+            >
+                <TableCell
+                    colSpan={5}
+                    align="center"
+                    style={{ userSelect: "none" }}
+                >
+                    Add New Task
+                </TableCell>
+            </TableRow>
+            {tasks.map((row: any) => (
+                <TableRow
+                    key={row.id}
+                    sx={{
+                        "&:last-child td, &:last-child th":
+                            { border: 0 },
+                    }}
+                    hover
+                    onClick={() => {
+                        setIsEditingTask(true);
+                        setEditedTask(row);
+                    }}
+                >
+                    <TableCell
+                        component="th"
+                        scope="row"
+                    >
+                        <TaskDoneCheckbox tasks={tasks} row={row} />
+                    </TableCell>
+                    <TableCell
+                        align="left"
+                        size="small"
+                    >
+                        {row.title}
+                    </TableCell>
+                    <TableCell
+                        align="left"
+                        sx={{ minWidth: 150 }}
+                    >
+                        {new Date(
+                            row.created_time
+                        ).toDateString()}
+                    </TableCell>
+                    <TableCell
+                        align="left"
+                        sx={{ minWidth: 150 }}
+                    >
+                        {new Date(
+                            row.updated_time
+                        ).toDateString()}
+                    </TableCell>
+                    <TableCell
+                        align="right"
+                        sx={{ paddingRight: 5 }}>
+                        <IconButton
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onDeletedTask(row)
+                            }}>
+                            <ClearIcon />
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
+            ))}
+        </TableBody>
+    }
+
     async function onDeletedTask(task: Task) {
         const response = await fetch("/api/deleted_task", {
             method: "DELETE",
@@ -53,10 +151,6 @@ export const TaskTable = ({
     useEffect(() => {
         fetchTasks();
     }, []);
-
-//    if (isLoading) {
-//        return <div>Loading...</div>;
-//    }
 
     return (
         <Box
@@ -118,108 +212,7 @@ export const TaskTable = ({
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
-                        <TableBody>
-                            <TableRow
-                                sx={{
-                                    "&:last-child td, &:last-child th": {
-                                        border: 0,
-                                    },
-                                }}
-                                hover
-                                onClick={() => setIsCreatingNewTask(true)}
-                            >
-                                <TableCell
-                                    colSpan={5}
-                                    align="center"
-                                    style={{ userSelect: "none" }}
-                                >
-                                    Add New Task
-                                </TableCell>
-                            </TableRow>
-                            {tasks.map((row: any) => (
-                                <TableRow
-                                    key={row.id}
-                                    sx={{
-                                        "&:last-child td, &:last-child th":
-                                            { border: 0 },
-                                    }}
-                                    hover
-                                    onClick={() => {
-                                        setIsEditingTask(true);
-                                        setEditedTask(row);
-                                    }}
-                                >
-                                    <TableCell
-                                        component="th"
-                                        scope="row"
-                                    >
-                                        <Checkbox
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                            }}
-                                            checked={row.is_done}
-                                            onChange={() => {
-                                                fetch("/api/set_done", {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type":
-                                                            "application/json",
-                                                    },
-                                                    body: JSON.stringify({
-                                                        id: row.id,
-                                                        done: !row.is_done,
-                                                    }),
-                                                });
-                                                row.is_done = !row.is_done;
-                                                const newTasks = tasks.map(
-                                                    (task: any) => {
-                                                        if (
-                                                            task.id === row.id
-                                                        ) {
-                                                            return row;
-                                                        }
-                                                        return task;
-                                                    }
-                                                );
-                                                //setTasks(newTasks);
-                                            }} />
-                                    </TableCell>
-                                    <TableCell
-                                        align="left"
-                                        size="small"
-                                    >
-                                        {row.title}
-                                    </TableCell>
-                                    <TableCell
-                                        align="left"
-                                        sx={{ minWidth: 150 }}
-                                    >
-                                        {new Date(
-                                            row.created_time
-                                        ).toDateString()}
-                                    </TableCell>
-                                    <TableCell
-                                        align="left"
-                                        sx={{ minWidth: 150 }}
-                                    >
-                                        {new Date(
-                                            row.updated_time
-                                        ).toDateString()}
-                                    </TableCell>
-                                    <TableCell
-                                        align="right"
-                                        sx={{ paddingRight: 5 }}>
-                                        <IconButton
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                onDeletedTask(row)
-                                            }}>
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
+                        <TaskTableBody tasks={tasks} />
                     </Table>
                 </Box>
                 <Divider />
