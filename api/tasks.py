@@ -23,6 +23,7 @@ class TaskOverviewResource(Resource):
                         'title': task.task_title,
                         'description': task.description,
                         'done': task.is_done,
+                        'tags' : task.tags,
                         'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
                         'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
                     }
@@ -47,7 +48,7 @@ class CreateTaskResource(Resource):
 
             if user:
                 json_data = request.get_json()
-                new_task = UserTask(user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'])
+                new_task = UserTask(user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'],tags=json_data['newTaskTags'])
                 db.session.add(new_task)
                 db.session.commit()
                 return {"message": "success"}
@@ -98,11 +99,14 @@ class ModifyTaskResource(Resource):
                 task_id = json_data.get('id')
                 new_title = json_data.get('title')
                 new_description = json_data.get('description')
+                new_tags = json_data.get('tags')
+
                 task = UserTask.query.filter_by(id=task_id, user_id=user.id).first()
 
                 if task:
                     task.task_title = new_title
                     task.description = new_description
+                    task.tags  = new_tags
                     db.session.commit()
                     return {"message": "success"}
                 else:
@@ -141,10 +145,17 @@ class SearchResource(Resource):
         if logged_in_user:
             user = UserLoginDetails.query.filter_by(username=logged_in_user).first()
 
+
+
             if user:
                 json_data = request.get_json()
                 task_title = json_data.get('title')
-                search_results = UserTask.query.filter(UserTask.task_title.ilike(f"%{task_title}%"), UserTask.user_id == user.id).all()
+                tags = json_data.get('tags')
+
+                if task_title == "":
+                    search_results = UserTask.query.filter(UserTask.tags.ilike(f"%{tags}%"), UserTask.user_id == user.id).all()
+                else:
+                    search_results = UserTask.query.filter(UserTask.task_title.ilike(f"%{task_title}%"), UserTask.user_id == user.id).all()
 
                 if search_results:
                     task_list = [
@@ -153,6 +164,7 @@ class SearchResource(Resource):
                             'title': task.task_title,
                             'description': task.description,
                             'done': task.is_done,
+                            'tags': task.tags,
                             'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
                             'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
                         }

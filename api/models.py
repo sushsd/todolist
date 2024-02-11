@@ -17,6 +17,6 @@ class UserTask(db.Model):
     description = db.Column(db.String(200), nullable=False)
     created_time = db.Column(db.DateTime,default=datetime.utcnow())
     updated_time = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    tags = db.Column(db.String(400),nullable=False)
 
     is_done = db.Column(db.Boolean,default=False)
