@@ -1,19 +1,44 @@
 import { useState } from 'react';
 import { Task } from '../src/Task';
-import { Modal, TextInput } from '@mantine/core';
+import { Modal, TextInput, Textarea, Button, Stack, Space } from '@mantine/core';
 
 export const CreateTaskModal = ({
     isOpen,
-    setIsTaskOpen,
+    setIsOpen,
+    onTaskCreated,
 }: {
     isOpen: boolean;
-    setIsTaskOpen: (open: boolean) => void;
+    setIsOpen: (open: boolean) => void;
+    onTaskCreated: () => void;
 }) => {
-    const [task, setTask] = useState<Task>(new Task({id: 0, title: '', tags: '', description: '', is_done: false, created_time: new Date(), updated_time: new Date()}));
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [newTaskDescription, setNewTaskDescription] = useState('');
+
+    const onCreateTask = async () => {
+        const response = await fetch('api/create_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newTaskTitle, newTaskDescription, }),
+        });
+        const data = await response.json();
+        onTaskCreated();
+    }
+
     return (
-        <Modal opened={isOpen} onClose={() => { setIsTaskOpen(false);}}>
+        <Modal title='Create New Task' size='100%' opened={isOpen} onClose={() => { setIsOpen(false); }}>
             <Modal.Body>
-                <TextInput label="Title" value={task.title} onChange={(event) => { task.title = event.currentTarget.value; }} />
+                <Stack gap='lg'>
+                    <TextInput label="Title" onChange={(event) => { setNewTaskTitle(event.target.value) }} />
+                    <Textarea autosize minRows={3} label="Description" onChange={(event) => { setNewTaskDescription(event.target.value) }} />
+                    <Button onClick={() => {
+                        onCreateTask();
+                        setIsOpen(false);
+                    }}>
+                        Create Task
+                    </Button>
+                </Stack>
             </Modal.Body>
         </Modal>
     );

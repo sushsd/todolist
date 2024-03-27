@@ -13,16 +13,22 @@ import {
     Anchor,
 } from '@mantine/core';
 import { useState } from 'react';
+import { useRouter } from "next/navigation";
 
 const FooterText = (
-isLogin: boolean,
-setIsLogin: (isLogin: boolean) => void
-) => {
+    {
+        isLogin,
+        setIsLogin
+    }:
+        {
+            isLogin: boolean,
+            setIsLogin: (isLogin: boolean) => void
+        }) => {
     if (isLogin) {
         return (
             <Text ta="center" size="sm">
                 Don't have an account?{' '}
-                <Anchor c="blue" inherit onClick={() => {setIsLogin(false)}}>
+                <Anchor c="blue" inherit onClick={() => { setIsLogin(false) }}>
                     Sign up
                 </Anchor>
             </Text>
@@ -31,7 +37,7 @@ setIsLogin: (isLogin: boolean) => void
         return (
             <Text ta="center" size="sm">
                 Already have an account?{' '}
-                <Anchor c="blue" inherit onClick={() => {setIsLogin(true)}}>
+                <Anchor c="blue" inherit onClick={() => { setIsLogin(true) }}>
                     Login
                 </Anchor>
             </Text>
@@ -39,32 +45,54 @@ setIsLogin: (isLogin: boolean) => void
     }
 }
 
-async function onRegister() {
-    const response = await fetch('api/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            name: 'John Doe',
-            password: '123456',
-        }),
-});
-
-async function onLogin() {
-    const response = await fetch('api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            name: 'John Doe',
-            password: '123456',
-        }),
-});
 
 export default function HomePage() {
     const [isLogin, setIsLogin] = useState(true);
+    const router = useRouter();
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+
+    async function onRegister(name: string, password: string) {
+        const response = await fetch('api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                password: password,
+            }),
+        });
+        const data = await response.json();
+        if (data.message === 'success') {
+            router.push('/overview');
+        }
+    }
+
+    async function onLogin(name: string, password: string) {
+        const response = await fetch('api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                password: password,
+            }),
+        });
+        const data = await response.json();
+        if (data.message === 'success') {
+            router.push('/overview');
+        }
+    }
+
+    async function onButtonClick() {
+        if (isLogin) {
+            onLogin(name, password);
+        } else {
+            onRegister(name, password);
+        }
+    }
 
     return (
         <Flex direction="column" align="center" justify="center" h="100vh">
@@ -82,10 +110,10 @@ export default function HomePage() {
                         >
                             Welcome to Bachh-Do
                         </Title>
-                        <TextInput label="Email Adress" placeholder="Email Adress" />
-                        <PasswordInput label="Password" placeholder="Password" />
+                        <TextInput label="Name" placeholder="Name" onChange={(event) => { setName(event.target.value) }} />
+                        <PasswordInput label="Password" placeholder="Password" onChange={(event) => { setPassword(event.target.value) }} />
                         <Space h="sm" />
-                        <Button variant="light" color="blue" fullWidth>
+                        <Button variant="light" color="blue" fullWidth onClick={() => { onButtonClick() }}>
                             {' '}
                             {isLogin ? "Login" : "Register"}
                             {' '}

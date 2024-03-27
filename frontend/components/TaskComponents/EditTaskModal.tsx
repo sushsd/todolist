@@ -11,7 +11,9 @@ export const EditTaskModal = ({
     setIsOpen: (open: boolean) => void;
     task: Task;
 }) => {
-    console.log(task.title);
+    if (!task) {
+        return null;
+    }
     return (
         <Modal.Root opened={isOpen} size="100%" onClose={() => { setIsOpen(false); }}>
             <Modal.Overlay />

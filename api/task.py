@@ -10,14 +10,15 @@ api = Api()
 
 
 class ViewTask(Resource):
-    def get(self):
+    def post(self):
         logged_in_user = session.get('loggedInUser')
         if logged_in_user:
             user = UserLogins.query.filter_by(username=logged_in_user).first()
 
             if user:
-                page = int(request.args.get('page', 1))
-                per_page = int(request.args.get('per_page', 10))
+                json_data = request.get_json()
+                page = int(json_data.get('page', 1))
+                per_page = int(json_data.get('per_page', 10))
                 tasks_pagination = Task.query.filter_by(user_id=user.id).paginate(
                     page=page, per_page=per_page, error_out=False)
                 task_list = [
@@ -32,6 +33,7 @@ class ViewTask(Resource):
                     }
                     for task in tasks_pagination.items
                 ]
+                print(page)
                 return {'message': 'success',
                         'username': logged_in_user,
                         'tasks': task_list,
@@ -60,6 +62,7 @@ class CreateTask(Resource):
                     user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'])
                 db.session.add(new_task)
                 db.session.commit()
+                print("Task created")
                 return {"message": "success"}
             else:
                 return {"message": "User not found"}, 404

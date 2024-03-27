@@ -12,8 +12,8 @@ export const TaskCard = ({
     activateEditTaskModal,
 }: {
     task: Task;
-    selectedTaskId: number;
-    prevSelectedTaskId: number;
+    selectedTaskId: number | null;
+    prevSelectedTaskId: number | null;
     setSelectedTask: (task: Task) => void;
     updateSelectedTask: () => void;
     activateEditTaskModal: () => void;
