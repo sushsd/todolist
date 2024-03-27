@@ -1,8 +1,9 @@
-from flask import request,session
-from flask_restful import Resource,Api
-from models import db,UserLogins
+from flask import request, session
+from flask_restful import Resource, Api
+from models import db, UserLogins
 
 api = Api()
+
 
 class RegisterResource(Resource):
     def post(self):
@@ -20,7 +21,6 @@ class RegisterResource(Resource):
             session['loggedInUser'] = username
             return {"message": "success"}
 
-#api.add_resource(RegisterResource,'/api/register')
 
 class LoginResource(Resource):
     def post(self):
@@ -29,17 +29,10 @@ class LoginResource(Resource):
         password = json_data['password']
         user = UserLogins.query.filter_by(username=username).first()
         if not user:
-            return{"message":"User not found."}
+            return {"message": "User not found."}
         else:
             if user.password == password:
                 session['loggedInUser'] = username
-                return{"message":"Success"}
+                return {"message": "Success"}
             else:
-                return{"message":"Incorrect Password"}
-api.add_resource(LoginResource,'/api/login')
-
-
-
-
-
-
+                return {"message": "Incorrect Password"}

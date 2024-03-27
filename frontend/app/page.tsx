@@ -39,6 +39,30 @@ setIsLogin: (isLogin: boolean) => void
     }
 }
 
+async function onRegister() {
+    const response = await fetch('api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: 'John Doe',
+            password: '123456',
+        }),
+});
+
+async function onLogin() {
+    const response = await fetch('api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: 'John Doe',
+            password: '123456',
+        }),
+});
+
 export default function HomePage() {
     const [isLogin, setIsLogin] = useState(true);
 
