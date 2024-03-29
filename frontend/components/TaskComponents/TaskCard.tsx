@@ -1,71 +1,74 @@
-import { useState } from 'react';
 import { Task } from '../src/Task';
-import { Card, Checkbox, Flex, ActionIcon, TextInput, Textarea, Transition, Text} from '@mantine/core';
-import { IconPencil } from '@tabler/icons-react';
+import { Card, Checkbox, Flex, ActionIcon, Text } from '@mantine/core';
+import { IconX } from '@tabler/icons-react';
+import { useState } from 'react';
 
 export const TaskCard = ({
-    task,
-    selectedTaskId,
-    prevSelectedTaskId,
-    setSelectedTask,
-    updateSelectedTask,
-    activateEditTaskModal,
+  task,
+  setSelectedTask,
+  activateEditTaskModal,
+  deleteTask,
+  setTaskDone,
 }: {
-    task: Task;
-    selectedTaskId: number | null;
-    prevSelectedTaskId: number | null;
-    setSelectedTask: (task: Task) => void;
-    updateSelectedTask: () => void;
-    activateEditTaskModal: () => void;
+  task: Task;
+  setSelectedTask: (task: Task) => void;
+  activateEditTaskModal: () => void;
+  deleteTask: () => void;
+  setTaskDone: (isDone: boolean) => void;
 }) => {
-    const incHeight = {
-        in: { height: 500 },
-        out: { height: 60},
-        common: { transformOrigin: 'top' },
-        transitionProperty: 'height',
-    };
-    const decHeight = {
-        in: { height: 60 },
-        out: { height: 500},
-        common: { transformOrigin: 'top' },
-        transitionProperty: 'height',
-    };
+  const [isHovered, setIsHovered] = useState(false);
+  const [taskDone, tool] = useState(task.is_done);
 
-    return (
-        <Transition
-            mounted={task.id === selectedTaskId || task.id === prevSelectedTaskId}
-            transition={task.id === selectedTaskId ? incHeight : decHeight}
-            duration={600}
-            timingFunction="ease-in-out"
-            keepMounted
-        >
-            {(transitionStyles) => (
-                <Card
-                    key={task.id}
-                    padding="md"
-                    shadow="xs"
-                    style={{ width: '100%', marginBottom: 10, height: task.id === selectedTaskId ? 60 : 60, ...(task.id === selectedTaskId || task.id === prevSelectedTaskId ? {} : {}) }}
-                    onClick={() => {
-                        updateSelectedTask();
-                        setSelectedTask(task);
-                    }}
-                >
-                    <Flex justify="space-between" gap="md" direction="column">
-                        <Flex justify="space-between" gap="md" align="center">
-                            <Flex gap="md" align='center'>
-                                <Checkbox checked={task.is_done} onChange={() => { }} />
-                                <Text>{task.title}</Text>
-                            </Flex>
-                            <ActionIcon onClick={(event) => {
-                                activateEditTaskModal();
-                            }} color="blue" title="Edit Task">
-                                <IconPencil />
-                            </ActionIcon>
-                        </Flex>
-                        <Text>{task.description}</Text>
-                    </Flex>
-                </Card>
-            )}
-        </Transition>
-    );
-}
+  return (
+    <Card
+      key={task.id}
+      padding="md"
+      shadow="xs"
+      bg={isHovered ? 'var(--mantine-color-default-hover)' : 'var(--mantine-color-default)'}
+      style={{ width: '100%', marginBottom: 10 }}
+      onClick={(event) => {
+        if (event.target.type !== "checkbox") {
+          setSelectedTask(task);
+          activateEditTaskModal();
+        }
+      }}
+      onMouseOver={() => {
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+      }}
+    >
+      <Flex justify="space-between" gap="md" direction="column">
+        <Flex justify="space-between" gap="md" align="center">
+          <Flex gap="md" align="center">
+            <Checkbox
+              checked={taskDone}
+              onChange={(event) => {
+                event.stopPropagation();
+                tool(!taskDone);
+                setTaskDone(!task.is_done);
+              }}
+            />
+            <Text>{task.title}</Text>
+          </Flex>
+          <ActionIcon
+            onClick={(event) => {
+              deleteTask();
+              event.stopPropagation();
+            }}
+            color="red"
+            title="Edit Task"
+          >
+            <IconX
+              style={{
+                width: '70%',
+                height: '70%',
+              }}
+            />
+          </ActionIcon>
+        </Flex>
+      </Flex>
+    </Card>
+  );
+};

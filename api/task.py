@@ -83,9 +83,9 @@ class ModifyTask(Resource):
                 json_data = request.get_json()
                 task_id = json_data.get('id')
                 new_title = json_data.get('title')
-                new_description = json_data.get('desciption')
+                new_description = json_data.get('description')
 
-                task = UserLogins.query.filter_by(
+                task = Task.query.filter_by(
                     id=task_id, user_id=user.id).first()
                 if task:
                     task.task_title = new_title
@@ -110,13 +110,15 @@ class DeleteTask(Resource):
         logged_in_user = session.get('loggedInUser')
         if logged_in_user:
             user = UserLogins.query.filter_by(username=logged_in_user).first()
+            print(user)
             if user:
                 json_data = request.get_json()
                 task_id = json_data.get('id')
-                task = UserLogins.query.filter_by(
+                print(task_id)
+                task = Task.query.filter_by(
                     id=task_id, user_id=user.id).first()
 
                 if task:
                     db.session.delete(task)
                     db.session.commit()
-                    return {"message": "Sucesss"}
+                    return {"message": "success"}

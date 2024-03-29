@@ -14,6 +14,7 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import { useRouter } from "next/navigation";
+import { setUserName } from '../components/src/Globals'
 
 const FooterText = (
     {
@@ -65,6 +66,7 @@ export default function HomePage() {
         });
         const data = await response.json();
         if (data.message === 'success') {
+            setUserName(name);
             router.push('/overview');
         }
     }
@@ -82,6 +84,7 @@ export default function HomePage() {
         });
         const data = await response.json();
         if (data.message === 'success') {
+            setUserName(name);
             router.push('/overview');
         }
     }

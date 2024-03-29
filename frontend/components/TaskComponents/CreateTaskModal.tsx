@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Task } from '../src/Task';
 import { Modal, TextInput, Textarea, Button, Stack, Space } from '@mantine/core';
 
 export const CreateTaskModal = ({
@@ -27,7 +26,7 @@ export const CreateTaskModal = ({
     }
 
     return (
-        <Modal title='Create New Task' size='100%' opened={isOpen} onClose={() => { setIsOpen(false); }}>
+        <Modal title='Create New Task' size='1000px' opened={isOpen} onClose={() => { setIsOpen(false); }}>
             <Modal.Body>
                 <Stack gap='lg'>
                     <TextInput label="Title" onChange={(event) => { setNewTaskTitle(event.target.value) }} />
