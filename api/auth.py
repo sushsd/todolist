@@ -13,13 +13,13 @@ class RegisterResource(Resource):
         print(username)
         user = UserLogins.query.filter_by(username=username).first()
         if user:
-            return {"message": "User already exists"}
+            return {"message": "user already exists"}
         else:
             user = UserLogins(username=username, password=password)
             db.session.add(user)
             db.session.commit()
             session['loggedInUser'] = username
-            return {"message": "Success"}
+            return {"message": "success"}
 
 
 class LoginResource(Resource):
@@ -29,10 +29,10 @@ class LoginResource(Resource):
         password = json_data['password']
         user = UserLogins.query.filter_by(username=username).first()
         if not user:
-            return {"message": "User not found."}
+            return {"message": "user not found."}
         else:
             if user.password == password:
                 session['loggedInUser'] = username
                 return {"message": "success"}
             else:
-                return {"message": "Incorrect Password"}
+                return {"message": "incorrect password"}

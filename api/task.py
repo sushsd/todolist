@@ -35,7 +35,7 @@ class ViewTask(Resource):
                     for task in tasks_pagination.items
                 ]
                 print(page)
-                return {'message': 'Success',
+                return {'message': 'success',
                         'username': logged_in_user,
                         'tasks': task_list,
                         'page': tasks_pagination.page,
@@ -43,9 +43,9 @@ class ViewTask(Resource):
                         }
 
             else:
-                return {"message": "User not found"}, 404
+                return {"message": "user not found"}, 404
         else:
-            return {"message": "User not logged in"}, 401
+            return {"message": "user not logged in"}, 401
 
 
 api.add_resource(ViewTask, '/api/task_overview')
@@ -64,11 +64,11 @@ class CreateTask(Resource):
                 db.session.add(new_task)
                 db.session.commit()
                 print("Task created")
-                return {"message": "Success"}
+                return {"message": "success"}
             else:
-                return {"message": "User not found"}, 404
+                return {"message": "user not found"}, 404
         else:
-            return {"message": "User not logged in"}, 401
+            return {"message": "user not logged in"}, 401
 
 
 api.add_resource(CreateTask, '/api/create_task')
@@ -95,14 +95,14 @@ class ModifyTask(Resource):
                     task.tags = new_tags
                     task.is_done = json_data.get('done')
                     db.session.commit()
-                    return {"message": "Success"}
+                    return {"message": "success"}
                 else:
-                    return {"message": "Task not found"}, 404
+                    return {"message": "task not found"}, 404
             else:
-                return {"message": "User not found"}, 404
+                return {"message": "user not found"}, 404
 
         else:
-            return {"message": "User not logged in"}, 401
+            return {"message": "user not logged in"}, 401
 
 
 api.add_resource(ModifyTask, '/api/modify_task')
@@ -124,7 +124,7 @@ class DeleteTask(Resource):
                 if task:
                     db.session.delete(task)
                     db.session.commit()
-                    return {"message": "Sucesss"}
+                    return {"message": "sucesss"}
 
 class SearchTask(Resource):
     def post(self):
@@ -156,11 +156,11 @@ class SearchTask(Resource):
                      }
                     for task in search_results
                 ]
-                    return {"message": "Success", 'username': logged_in_user, 'tasks': task_list}
+                    return {"message": "success", 'username': logged_in_user, 'tasks': task_list}
                 else:
-                    return {"message": "No matching result"}
+                    return {"message": "no matching result"}
             else:
-                return {"message": "User not found"}, 404
+                return {"message": "user not found"}, 404
 
         else:
-            return {"message": "User not logged in"}, 401
+            return {"message": "user not logged in"}, 401
