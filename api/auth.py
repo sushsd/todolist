@@ -19,7 +19,7 @@ class RegisterResource(Resource):
             db.session.add(user)
             db.session.commit()
             session['loggedInUser'] = username
-            return {"message": "success"}
+            return {"message": "Success"}
 
 
 class LoginResource(Resource):

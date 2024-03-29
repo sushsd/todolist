@@ -27,6 +27,7 @@ class ViewTask(Resource):
                         'title': task.task_title,
                         'description': task.description,
                         'done': task.is_done,
+                        'tags': task.tags,
                         'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
                         'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
 
@@ -34,7 +35,7 @@ class ViewTask(Resource):
                     for task in tasks_pagination.items
                 ]
                 print(page)
-                return {'message': 'success',
+                return {'message': 'Success',
                         'username': logged_in_user,
                         'tasks': task_list,
                         'page': tasks_pagination.page,
@@ -59,11 +60,11 @@ class CreateTask(Resource):
             if user:
                 json_data = request.get_json()
                 new_task = Task(
-                    user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'])
+                    user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'],tags=json_data['newTaskTags'])
                 db.session.add(new_task)
                 db.session.commit()
                 print("Task created")
-                return {"message": "success"}
+                return {"message": "Success"}
             else:
                 return {"message": "User not found"}, 404
         else:
@@ -84,15 +85,17 @@ class ModifyTask(Resource):
                 task_id = json_data.get('id')
                 new_title = json_data.get('title')
                 new_description = json_data.get('description')
+                new_tags = json_data.get('tags')
 
                 task = Task.query.filter_by(
                     id=task_id, user_id=user.id).first()
                 if task:
                     task.task_title = new_title
                     task.description = new_description
+                    task.tags = new_tags
                     task.is_done = json_data.get('done')
                     db.session.commit()
-                    return {"message": "success"}
+                    return {"message": "Success"}
                 else:
                     return {"message": "Task not found"}, 404
             else:
@@ -121,4 +124,43 @@ class DeleteTask(Resource):
                 if task:
                     db.session.delete(task)
                     db.session.commit()
-                    return {"message": "success"}
+                    return {"message": "Sucesss"}
+
+class SearchTask(Resource):
+    def post(self):
+        logged_in_user = session.get('loggedInUser')
+        if logged_in_user:
+            user = UserLogins.query.filter_by(username=logged_in_user).first()
+
+            if user:
+                json_data = request.get_json()
+                task_title = json_data.get('title')
+                tags = json_data.get('tags')
+
+                if task_title == "":
+                    search_results = Task.query.filter(Task.tags.ilike(f"%{tags}"),Task.user_id == user.id).all()
+                else:
+                    search_results = Task.query.filter(Task.task_title.ilike(f"{task_title}"),Task.user_id).all()
+
+                if search_results:
+                    task_list =[
+                    {
+                        'id': task.id,
+                        'title': task.task_title,
+                        'description': task.description,
+                        'done': task.is_done,
+                        'tags': task.tags,
+                        'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
+                        'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
+
+                     }
+                    for task in search_results
+                ]
+                    return {"message": "Success", 'username': logged_in_user, 'tasks': task_list}
+                else:
+                    return {"message": "No matching result"}
+            else:
+                return {"message": "User not found"}, 404
+
+        else:
+            return {"message": "User not logged in"}, 401
