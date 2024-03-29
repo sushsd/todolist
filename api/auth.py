@@ -33,6 +33,6 @@ class LoginResource(Resource):
         else:
             if user.password == password:
                 session['loggedInUser'] = username
-                return {"message": "Success"}
+                return {"message": "success"}
             else:
                 return {"message": "Incorrect Password"}

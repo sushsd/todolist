@@ -83,6 +83,7 @@ export default function HomePage() {
             }),
         });
         const data = await response.json();
+            console.log(data);
         if (data.message === 'success') {
             setUserName(name);
             router.push('/overview');
