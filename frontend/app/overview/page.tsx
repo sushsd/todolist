@@ -4,7 +4,8 @@ import { CreateTaskModal } from '@/components/TaskComponents/CreateTaskModal';
 import { EditTaskModal } from '@/components/TaskComponents/EditTaskModal';
 import { TaskCard } from '@/components/TaskComponents/TaskCard';
 import { Task } from '@/components/src/Task';
-import { AppShell, Burger, Stack, Pagination, px, Text, Button, Group, Center } from '@mantine/core';
+import { AppShell, Burger, Stack, Pagination, px, Text, Button, Group, Center, Flex, TextInput, ActionIcon } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { userName } from '@/components/src/Globals';
@@ -77,6 +78,7 @@ export default function TaskOverview() {
         }
     }
 
+    const searchIconButton = <ActionIcon variant='transparent'><IconSearch /></ActionIcon>;
 
     return (
         <AppShell
@@ -89,12 +91,12 @@ export default function TaskOverview() {
             padding={padding}
         >
             <AppShell.Header>
-                <Burger opened={opened} onClick={toggle} hiddenFrom='sm' size='sm' />
-                <Group justify='space-between'>
+                <Group justify='space-between' style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10}} align='center'>
+                    <Burger opened={opened} onClick={toggle} hiddenFrom='sm' size='sm' />
                     <Text>Task Overview</Text>
-                    <Text style={{ padding: "xl" }}>{userName}</Text>
+                    <Text>{userName}</Text>
+                    <TextInput placeholder='Search' rightSection={searchIconButton}/>
                 </Group>
-
             </AppShell.Header>
             <AppShell.Navbar p='md'>Navbar</AppShell.Navbar>
             <AppShell.Main>

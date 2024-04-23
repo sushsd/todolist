@@ -12,6 +12,7 @@ export const CreateTaskModal = ({
 }) => {
     const [newTaskTitle, setNewTaskTitle] = useState('');
     const [newTaskDescription, setNewTaskDescription] = useState('');
+    const [newTaskTags, setNewTaskTags] = useState<string>("");
 
     const onCreateTask = async () => {
         const response = await fetch('api/create_task', {
@@ -19,7 +20,7 @@ export const CreateTaskModal = ({
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ newTaskTitle, newTaskDescription, }),
+            body: JSON.stringify({ newTaskTitle, newTaskDescription, newTaskTags}),
         });
         const data = await response.json();
         onTaskCreated();
