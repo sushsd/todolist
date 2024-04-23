@@ -27,7 +27,7 @@ class ViewTask(Resource):
                         'title': task.task_title,
                         'description': task.description,
                         'done': task.is_done,
-                        'tags': task.tags,
+                        'tags': task.tags.split(' ') if task.tags else [],
                         'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
                         'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
 
@@ -60,7 +60,7 @@ class CreateTask(Resource):
             if user:
                 json_data = request.get_json()
                 new_task = Task(
-                    user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'], tags=json_data['newTaskTags'])
+                    user_id=user.id, task_title=json_data['newTaskTitle'], description=json_data['newTaskDescription'],tags=json_data['newTaskTags'])
                 db.session.add(new_task)
                 db.session.commit()
                 print("Task created")
@@ -124,8 +124,7 @@ class DeleteTask(Resource):
                 if task:
                     db.session.delete(task)
                     db.session.commit()
-                    return {"message": "success"}
-
+                    return {"message": "sucesss"}
 
 class SearchTask(Resource):
     def post(self):
@@ -139,26 +138,28 @@ class SearchTask(Resource):
                 tags = json_data.get('tags')
 
                 if task_title == "":
-                    search_results = Task.query.filter(Task.tags.ilike(
-                        f"%{tags}"), Task.user_id == user.id).all()
+                    if tags:
+                        tags_list = tags.split(' ')
+                        search_results = Task.query.filter(Task.tags.ilike(f"%{tags_list}"),Task.user_id == user.id).all()
+                    else:
+                        search_results = Task.query.filter(Task.user_id == user.id).all()
                 else:
-                    search_results = Task.query.filter(
-                        Task.task_title.ilike(f"{task_title}"), Task.user_id).all()
+                    search_results = Task.query.filter(Task.task_title.ilike(f"{task_title}"),Task.user_id).all()
 
                 if search_results:
-                    task_list = [
-                        {
-                            'id': task.id,
-                            'title': task.task_title,
-                            'description': task.description,
-                            'done': task.is_done,
-                            'tags': task.tags,
-                            'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
-                            'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
+                    task_list =[
+                    {
+                        'id': task.id,
+                        'title': task.task_title,
+                        'description': task.description,
+                        'done': task.is_done,
+                        'tags': task.tags.split(' ') if task.tags else [],
+                        'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
+                        'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
 
-                        }
-                        for task in search_results
-                    ]
+                     }
+                    for task in search_results
+                ]
                     return {"message": "success", 'username': logged_in_user, 'tasks': task_list}
                 else:
                     return {"message": "no matching result"}
