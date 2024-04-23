@@ -124,7 +124,7 @@ class DeleteTask(Resource):
                 if task:
                     db.session.delete(task)
                     db.session.commit()
-                    return {"message": "sucesss"}
+                    return {"message": "success"}
 
 class SearchTask(Resource):
     def post(self):
