@@ -18,6 +18,7 @@ export default function TaskOverview() {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
+    const [searchTerm, setSearchTerm] = useState<string>("");
 
     const headerHeight = 60;
     const padding = 10;
@@ -78,7 +79,26 @@ export default function TaskOverview() {
         }
     }
 
-    const searchIconButton = <ActionIcon variant='transparent'><IconSearch /></ActionIcon>;
+    const findTasks = async (searchTerm: string) => {
+        const response = await fetch('api/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                {
+                    title: searchTerm,
+                }
+            ),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.message === 'success') {
+            setTasks(data.tasks.map((task: any) => new Task(task)));
+        }
+    }
+
+    const searchIconButton = <ActionIcon variant='transparent' onClick={() => findTasks(searchTerm)}><IconSearch /></ActionIcon>;
 
     return (
         <AppShell
@@ -91,16 +111,16 @@ export default function TaskOverview() {
             padding={padding}
         >
             <AppShell.Header>
-                <Group justify='space-between' style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10}} align='center'>
+                <Group justify='space-between' style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10 }} align='center'>
                     <Burger opened={opened} onClick={toggle} hiddenFrom='sm' size='sm' />
                     <Text>Task Overview</Text>
                     <Text>{userName}</Text>
-                    <TextInput placeholder='Search' rightSection={searchIconButton}/>
+                    <TextInput placeholder='Search' value={searchTerm} onChange={(event) => setSearchTerm(event.currentTarget.value)} rightSection={searchIconButton} />
                 </Group>
             </AppShell.Header>
             <AppShell.Navbar p='md'>Navbar</AppShell.Navbar>
             <AppShell.Main>
-                <EditTaskModal isOpen={isEditTaskModalOpen} setIsOpen={setIsEditTaskModalOpen} fetchTasks={() => {fetchTasks(page)}} task={selectedTask!} />
+                <EditTaskModal isOpen={isEditTaskModalOpen} setIsOpen={setIsEditTaskModalOpen} fetchTasks={() => { fetchTasks(page) }} task={selectedTask!} />
                 <CreateTaskModal isOpen={isCreateTaskModalOpen} setIsOpen={setIsCreateTaskModalOpen} onTaskCreated={() => { fetchTasks(page) }} />
                 <Stack justify='space-between' align='stretch' style={{ height: mainHeight }}>
                     <Stack gap='0px' align='center'>
