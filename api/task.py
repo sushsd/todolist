@@ -169,3 +169,12 @@ class SearchTask(Resource):
 
         else:
             return {"message": "user not logged in"}, 401
+
+class Logout(Resource):
+    def get(self):
+        session.pop('loggedInUser', None)
+        return {"message": "Logged out successfully"}
+
+
+
+

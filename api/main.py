@@ -2,7 +2,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
 from models import db
-from task import ViewTask, CreateTask, ModifyTask, DeleteTask,SearchTask
+from task import ViewTask, CreateTask, ModifyTask, DeleteTask,SearchTask,Logout
 from auth import LoginResource, RegisterResource
 
 app = Flask(__name__)
@@ -26,6 +26,7 @@ def create_tables():
     api.add_resource(ModifyTask, '/api/modify_task')
     api.add_resource(DeleteTask, '/api/delete')
     api.add_resource(SearchTask, '/api/search')
+    api.add_resource(Logout, '/api/logout')
 
 
     return app
