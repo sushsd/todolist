@@ -140,11 +140,12 @@ class SearchTask(Resource):
                 if task_title == "":
                     if tags:
                         tags_list = tags.split(' ')
-                        search_results = Task.query.filter(Task.tags.ilike(f"%{tags_list}"),Task.user_id == user.id).all()
+                        search_results = Task.query.filter(Task.tags.ilike(f"%{tags_list}%"),Task.user_id == user.id).all()
                     else:
                         search_results = Task.query.filter(Task.user_id == user.id).all()
                 else:
-                    search_results = Task.query.filter(Task.task_title.ilike(f"{task_title}"),Task.user_id).all()
+                    search_results = Task.query.filter(Task.task_title.ilike(f"%{task_title}%"),Task.user_id).all()
+
 
                 if search_results:
                     task_list =[
