@@ -48,9 +48,6 @@ class ViewTask(Resource):
             return {"message": "user not logged in"}, 401
 
 
-api.add_resource(ViewTask, '/api/task_overview')
-
-
 class CreateTask(Resource):
     def post(self):
         logged_in_user = session.get('loggedInUser')
@@ -71,7 +68,6 @@ class CreateTask(Resource):
             return {"message": "user not logged in"}, 401
 
 
-api.add_resource(CreateTask, '/api/create_task')
 
 
 class ModifyTask(Resource):
@@ -127,6 +123,7 @@ class DeleteTask(Resource):
                     return {"message": "success"}
 
 class SearchTask(Resource):
+ class SearchTask(Resource):
     def post(self):
         logged_in_user = session.get('loggedInUser')
         if logged_in_user:
@@ -136,39 +133,47 @@ class SearchTask(Resource):
                 json_data = request.get_json()
                 task_title = json_data.get('title')
                 tags = json_data.get('tags')
+                page = int(json_data.get('page', 1))
+                per_page = int(json_data.get('per_page', 10))
 
                 if task_title == "":
                     if tags:
                         tags_list = tags.split(' ')
-                        search_results = Task.query.filter(Task.tags.ilike(f"%{tags_list}%"),Task.user_id == user.id).all()
+                        search_results= Task.query.filter(Task.tags.ilike(f"%{tags_list}%"), Task.user_id == user.id)
                     else:
-                        search_results = Task.query.filter(Task.user_id == user.id).all()
+                        search_results = Task.query.filter(Task.user_id == user.id)
                 else:
-                    search_results = Task.query.filter(Task.task_title.ilike(f"%{task_title}%"),Task.user_id).all()
+                    search_results = Task.query.filter(Task.task_title.ilike(f"%{task_title}%"), Task.user_id == user.id)
 
+                search_results_pagination = search_results.paginate(page=page, per_page=per_page, error_out=False)
 
-                if search_results:
-                    task_list =[
-                    {
-                        'id': task.id,
-                        'title': task.task_title,
-                        'description': task.description,
-                        'done': task.is_done,
-                        'tags': task.tags.split(' ') if task.tags else [],
-                        'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
-                        'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
-
-                     }
-                    for task in search_results
-                ]
-                    return {"message": "success", 'username': logged_in_user, 'tasks': task_list}
+                if search_results_pagination.items:
+                    task_list = [
+                        {
+                            'id': task.id,
+                            'title': task.task_title,
+                            'description': task.description,
+                            'done': task.is_done,
+                            'tags': task.tags.split(' ') if task.tags else [],
+                            'created_time': json.dumps(task.created_time, indent=4, sort_keys=True, default=str),
+                            'updated_time': json.dumps(task.updated_time, indent=4, sort_keys=True, default=str)
+                        }
+                        for task in search_results_pagination.items
+                    ]
+                    return {
+                        "message": "success",
+                        'username': logged_in_user,
+                        'tasks': task_list,
+                        'page': search_results_pagination.page,
+                        'total_pages': math.ceil(search_results_pagination.total / per_page)
+                    }
                 else:
                     return {"message": "no matching result"}
             else:
                 return {"message": "user not found"}, 404
-
         else:
             return {"message": "user not logged in"}, 401
+
 
 class Logout(Resource):
     def get(self):
