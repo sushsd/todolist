@@ -123,7 +123,6 @@ class DeleteTask(Resource):
                     return {"message": "success"}
 
 class SearchTask(Resource):
- class SearchTask(Resource):
     def post(self):
         logged_in_user = session.get('loggedInUser')
         if logged_in_user:

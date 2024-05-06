@@ -9,6 +9,7 @@ import { IconSearch } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { userName } from '@/components/src/Globals';
+import { useRouter } from "next/navigation";
 
 export default function TaskOverview() {
     const [opened, { toggle }] = useDisclosure();
@@ -19,10 +20,22 @@ export default function TaskOverview() {
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const router = useRouter();
 
     const headerHeight = 60;
     const padding = 10;
     const mainHeight = `calc(100vh - ${px(headerHeight + padding * 2)}px)`;
+
+    const logOut = async () => {
+        const response = await fetch('api/task_overview', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        router.push('');
+    }
 
     const fetchTasks = async (page: number) => {
         const response = await fetch('api/task_overview', {
@@ -79,7 +92,7 @@ export default function TaskOverview() {
         }
     }
 
-    const findTasks = async (searchTerm: string) => {
+    const findTasks = async (searchTerm: string, page: number) => {
         const response = await fetch('api/search', {
             method: 'POST',
             headers: {
@@ -88,6 +101,8 @@ export default function TaskOverview() {
             body: JSON.stringify(
                 {
                     title: searchTerm,
+                    page: page,
+                    per_page: 10
                 }
             ),
         });
@@ -95,10 +110,11 @@ export default function TaskOverview() {
         console.log(data);
         if (data.message === 'success') {
             setTasks(data.tasks.map((task: any) => new Task(task)));
+            setTotalPages(data.total_pages);
         }
     }
 
-    const searchIconButton = <ActionIcon variant='transparent' onClick={() => findTasks(searchTerm)}><IconSearch /></ActionIcon>;
+    const searchIconButton = <ActionIcon variant='transparent' onClick={() => findTasks(searchTerm, 1)}><IconSearch /></ActionIcon>;
 
     return (
         <AppShell
@@ -115,6 +131,7 @@ export default function TaskOverview() {
                     <Burger opened={opened} onClick={toggle} hiddenFrom='sm' size='sm' />
                     <Text>Task Overview</Text>
                     <Text>{userName}</Text>
+                    <Button onClick={() => logOut()}>Logout</Button>
                     <TextInput placeholder='Search' value={searchTerm} onChange={(event) => setSearchTerm(event.currentTarget.value)} rightSection={searchIconButton} />
                 </Group>
             </AppShell.Header>
@@ -147,7 +164,12 @@ export default function TaskOverview() {
                             value={page}
                             onChange={(event) => {
                                 setPage(event);
-                                fetchTasks(event);
+                                if (searchTerm === "") {
+                                    fetchTasks(event);
+                                }
+                                else {
+                                    findTasks(searchTerm, event);
+                                }
                             }} />
                     </Center>
                 </Stack>
