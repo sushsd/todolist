@@ -27,14 +27,14 @@ export default function TaskOverview() {
     const mainHeight = `calc(100vh - ${px(headerHeight + padding * 2)}px)`;
 
     const logOut = async () => {
-        const response = await fetch('api/task_overview', {
+        const response = await fetch('api/logout', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
         const data = await response.json();
-        router.push('');
+        router.push('.');
     }
 
     const fetchTasks = async (page: number) => {
